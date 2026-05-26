@@ -1,4 +1,6 @@
 <?php
+error_reporting(0);
+ini_set("display_errors","0");
 /**
  * upload_proxy.php — Proxy upload FILE ke 8upload.com
  * Letakkan di: img.beritatkp.com/upload_proxy.php
@@ -6,7 +8,6 @@
 
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
-error_reporting(E_ALL);
 
 // ── CORS: izinkan request dari browser (XHR langsung dari WP admin) ────────
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
@@ -114,7 +115,6 @@ $httpCode    = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $headerSize  = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 $effectiveUrl= curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
 $curlErr     = curl_error($ch);
-curl_close($ch);
 
 if ($curlErr) {
     echo json_encode([
@@ -265,7 +265,6 @@ function httpGet(string $url, array $extra = []): ?string
     ]);
     $body = curl_exec($ch);
     $err  = curl_error($ch);
-    curl_close($ch);
     return ($err || $body === false) ? null : $body;
 }
 
