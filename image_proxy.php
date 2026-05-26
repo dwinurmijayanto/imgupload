@@ -1,4 +1,10 @@
 <?php
+// Matikan semua warning/deprecated agar tidak bocor ke output binary
+error_reporting(0);
+ini_set('display_errors', '0');
+// Buffer output — cegah warning PHP keluar sebelum header()
+ob_start();
+
 /**
  * Image Proxy — img.vidshare.my.id/images/{id}/{filename}
  *
@@ -97,7 +103,7 @@ curl_setopt_array($ch, [
 $imageData = curl_exec($ch);
 $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $curlErr   = curl_error($ch);
-curl_close($ch);
+// curl_close() deprecated sejak PHP 8.5, tidak perlu dipanggil
 
 if ($curlErr || $httpCode !== 200 || empty($imageData)) {
     http_response_code($httpCode ?: 502);
@@ -121,6 +127,9 @@ function sendImage(string $path, string $mime, string $data = null): void
     $size    = strlen($data);
     $etag    = '"' . md5($data) . '"';
     $lastMod = gmdate('D, d M Y H:i:s', filemtime($path)) . ' GMT';
+
+    // Buang semua output yang terlanjur ter-buffer (warning, whitespace, dll)
+    if (ob_get_level()) ob_end_clean();
 
     // Conditional request support
     $ifNoneMatch = $_SERVER['HTTP_IF_NONE_MATCH'] ?? '';
