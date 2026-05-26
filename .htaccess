@@ -1,0 +1,32 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# .htaccess untuk img.vidshare.my.id
+# Letakkan di root direktori server (sama dengan image_proxy.php)
+# ─────────────────────────────────────────────────────────────────────────────
+
+Options -Indexes
+RewriteEngine On
+
+# ── Proxy route: /images/{id}/{filename} → image_proxy.php ───────────────────
+# Jangan redirect kalau path adalah file fisik yang ada
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^images/(.+)$ image_proxy.php?path=$1 [QSA,L]
+
+# ── Keamanan: sembunyikan header PHP ─────────────────────────────────────────
+<IfModule mod_headers.c>
+    Header unset X-Powered-By
+    Header always unset X-Powered-By
+
+    # Cegah gambar diindex oleh Google Image Search (opsional)
+    # Header set X-Robots-Tag "noindex, nofollow"
+</IfModule>
+
+# ── Cache gambar di browser 7 hari ───────────────────────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg  "access plus 7 days"
+    ExpiresByType image/png   "access plus 7 days"
+    ExpiresByType image/gif   "access plus 7 days"
+    ExpiresByType image/webp  "access plus 7 days"
+    ExpiresByType image/avif  "access plus 7 days"
+</IfModule>
